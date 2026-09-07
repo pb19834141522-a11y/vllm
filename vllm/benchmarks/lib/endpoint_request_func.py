@@ -100,6 +100,8 @@ class RequestFuncOutput:
     error: str = ""
     start_time: float = 0.0
     input_audio_duration: float = 0.0  # in seconds
+    chunk_token_counts: list[int] = field(default_factory=list)
+    chunk_timestamps: list[float] = field(default_factory=list)
 
 
 class RequestFunc(Protocol):
@@ -184,6 +186,7 @@ async def async_request_openai_completions(
         "stream_options": {
             "include_usage": True,
         },
+        "return_token_ids": True,
     }
     _update_payload_common(payload, request_func_input)
 
@@ -229,6 +232,14 @@ async def async_request_openai_completions(
                                 # e.g. for special tokens
                                 text = choices[0].get("text")
                                 timestamp = time.perf_counter()
+                                token_ids = choices[0].get("token_ids")
+                                if token_ids is None:
+                                    raise RuntimeError(
+                                        "Token-timeline benchmark requires "
+                                        "return_token_ids support from the server."
+                                    )
+                                output.chunk_token_counts.append(len(token_ids))
+                                output.chunk_timestamps.append(timestamp)
                                 # First token
                                 if not first_chunk_received:
                                     first_chunk_received = True

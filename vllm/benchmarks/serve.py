@@ -1273,6 +1273,8 @@ async def benchmark(
             "ttfts": [output.ttft for output in outputs],
             "itls": [output.itl for output in outputs],
             "start_times": [output.start_time for output in outputs],
+            "chunk_token_counts": [output.chunk_token_counts for output in outputs],
+            "chunk_timestamps": [output.chunk_timestamps for output in outputs],
             "generated_texts": [output.generated_text for output in outputs],
             "errors": [output.error for output in outputs],
             "max_output_tokens_per_s": metrics.max_output_tokens_per_s,
